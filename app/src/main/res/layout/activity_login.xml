@@ -64,15 +64,15 @@
         android:layout_width="0dp"
         android:layout_height="35dp"
         android:background="@drawable/round_corner_button"
-        android:text="登陆"
+        android:text="@string/login_button_title"
         android:textColor="#ffffff"
         android:textStyle="bold"
-        android:padding="5dp"
         app:layout_constraintBottom_toTopOf="@+id/copyright_text"
         app:layout_constraintEnd_toEndOf="@+id/password_edit"
         app:layout_constraintStart_toStartOf="@+id/password_edit"
         app:layout_constraintTop_toBottomOf="@+id/password_edit"
         android:layout_marginTop="15dp"
+        style="?android:attr/borderlessButtonStyle"
         />
 
     <TextView

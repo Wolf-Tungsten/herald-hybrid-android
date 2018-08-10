@@ -1,5 +1,8 @@
 package cn.myseu.heraldapp;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
@@ -8,24 +11,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebSettings;
 
 import java.util.ArrayList;
-
-import io.reactivex.functions.Consumer;
 
 public class HomeActivity extends AppCompatActivity {
 
     public static String BASE_URL = "http://192.168.1.101:8080";
     private WebView mWebView;
 
-    private ArrayList<LinearLayout> tabButtons = new ArrayList<>();
-    private ArrayList<ImageView> tabImages = new ArrayList<>();
-    private ArrayList<TextView> tabTexts = new ArrayList<>();
+    private ArrayList<LinearLayout> mTabButtons = new ArrayList<>();
+    private ArrayList<ImageView> mTabImageViews = new ArrayList<>();
+    private ArrayList<TextView> mTabTextViews = new ArrayList<>();
     private String[] tabPath = { "/home-tab/", "/activity-tab/", "/notification-tab/", "/personal-tab/"};
-
+    private int mTabCurrentIndex = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,33 +43,77 @@ public class HomeActivity extends AppCompatActivity {
         findTabViews();
         setTabListener();
 
+        Intent intent =  new Intent(HomeActivity.this, LoginActivity.class);
+        startActivity(intent);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String token = getToken();
+        if (!token.equals("no-token")) {
+            // token存在
+            // TODO： 注入到WebView中
+        } else {
+            // token不存在
+            Intent intent =  new Intent(HomeActivity.this, LoginActivity.class);
+            startActivity(intent);
+        }
+
+    }
+
+    private String getToken() {
+        SharedPreferences tokenSharedPreferences = getSharedPreferences("token", MODE_PRIVATE);
+        return tokenSharedPreferences.getString("token", "no-token");
     }
 
     private void findTabViews() {
         // 获取TabButtons
-        tabButtons.add( (LinearLayout) findViewById(R.id.tab_home_button));
-        tabButtons.add( (LinearLayout) findViewById(R.id.tab_activity_button));
-        tabButtons.add( (LinearLayout) findViewById(R.id.tab_notification_button));
-        tabButtons.add( (LinearLayout) findViewById(R.id.tab_personal_button));
+        mTabButtons.add( (LinearLayout) findViewById(R.id.tab_home_button));
+        mTabButtons.add( (LinearLayout) findViewById(R.id.tab_activity_button));
+        mTabButtons.add( (LinearLayout) findViewById(R.id.tab_notification_button));
+        mTabButtons.add( (LinearLayout) findViewById(R.id.tab_personal_button));
         // 获取TabImages
-        tabImages.add( (ImageView) findViewById(R.id.tab_home_image));
-        tabImages.add( (ImageView) findViewById(R.id.tab_activity_image));
-        tabImages.add( (ImageView) findViewById(R.id.tab_notification_image));
-        tabImages.add( (ImageView) findViewById(R.id.tab_personal_image));
+        mTabImageViews.add( (ImageView) findViewById(R.id.tab_home_image));
+        mTabImageViews.add( (ImageView) findViewById(R.id.tab_activity_image));
+        mTabImageViews.add( (ImageView) findViewById(R.id.tab_notification_image));
+        mTabImageViews.add( (ImageView) findViewById(R.id.tab_personal_image));
         // 获取tabTexts
-        tabTexts.add( (TextView) findViewById(R.id.tab_home_text));
-        tabTexts.add( (TextView) findViewById(R.id.tab_activity_text));
-        tabTexts.add( (TextView) findViewById(R.id.tab_notification_text));
-        tabTexts.add( (TextView) findViewById(R.id.tab_personal_text));
+        mTabTextViews.add( (TextView) findViewById(R.id.tab_home_text));
+        mTabTextViews.add( (TextView) findViewById(R.id.tab_activity_text));
+        mTabTextViews.add( (TextView) findViewById(R.id.tab_notification_text));
+        mTabTextViews.add( (TextView) findViewById(R.id.tab_personal_text));
     }
 
     private void setTabListener() {
-        for ( LinearLayout button: tabButtons) {
-            final int index = tabButtons.indexOf(button);
+        for ( LinearLayout button: mTabButtons) {
+            final int index = mTabButtons.indexOf(button);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mWebView.loadUrl(HomeActivity.BASE_URL + tabPath[index]);
+                    if (index != mTabCurrentIndex) {
+                        mTabCurrentIndex = index;
+                        int[] selectedIcons = {R.drawable.home_tab_icon_selected,
+                                R.drawable.activity_tab_icon_selected,
+                                R.drawable.notification_tab_icon_selected,
+                                R.drawable.personal_tab_icon_selected};
+
+                        int[] icons = {R.drawable.home_tab_icon,
+                                R.drawable.activity_tab_icon,
+                                R.drawable.notification_tab_icon,
+                                R.drawable.personal_tab_icon};
+                        mWebView.loadUrl(HomeActivity.BASE_URL + tabPath[index]);
+                        for (int buttonIndex = 0; buttonIndex < mTabButtons.size(); buttonIndex++) {
+                            if(buttonIndex == index){
+                                mTabImageViews.get(index).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),selectedIcons[index]));
+                                mTabTextViews.get(index).setTextColor(getResources().getColor(R.color.colorPrimary));
+                            } else {
+                                mTabImageViews.get(index).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),icons[index]));
+                                mTabTextViews.get(index).setTextColor(getResources().getColor(R.color.colorUnfocused));
+                            }
+                        }
+                    }
                 }
             });
         }
