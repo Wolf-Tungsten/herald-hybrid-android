@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    tools:layout_editor_absoluteY="25dp"
+    android:background="#ffffff">
+
+    <ImageView
+        android:id="@+id/login_face"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toTopOf="@+id/cardnum_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:srcCompat="@drawable/icon_normal" />
+
+    <EditText
+        android:id="@+id/cardnum_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="12"
+        android:hint="@string/cardnum_hint"
+        android:inputType="textPersonName"
+        android:background="@drawable/round_corner_edittext"
+        android:padding="10dp"
+        android:textSize="14dp"
+        android:textColorHint="#bcbcbc"
+        android:textColor="#333333"
+        app:layout_constraintBottom_toTopOf="@+id/password_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_face"
+        android:layout_marginTop="10dp"
+        />
+
+    <EditText
+        android:id="@+id/password_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="12"
+        android:hint="@string/password_hint"
+        android:inputType="textPassword"
+        android:background="@drawable/round_corner_edittext"
+        android:padding="10dp"
+        android:textSize="14dp"
+        android:textColorHint="#bcbcbc"
+        android:textColor="#333333"
+        app:layout_constraintBottom_toTopOf="@+id/login_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardnum_edit"
+        android:layout_marginTop="10dp"
+        />
+
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:background="@drawable/round_corner_button"
+        android:text="登陆"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/copyright_text"
+        app:layout_constraintEnd_toEndOf="@+id/password_edit"
+        app:layout_constraintStart_toStartOf="@+id/password_edit"
+        app:layout_constraintTop_toBottomOf="@+id/password_edit"
+        android:layout_marginTop="15dp"
+        />
+
+    <TextView
+        android:id="@+id/copyright_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/copyright"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="10dp"
+        android:textColor="#bcbcbc"/>
+
+</android.support.constraint.ConstraintLayout>
