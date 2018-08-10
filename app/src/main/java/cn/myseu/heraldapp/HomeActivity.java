@@ -42,10 +42,6 @@ public class HomeActivity extends AppCompatActivity {
         // 获取Tab元素
         findTabViews();
         setTabListener();
-
-        Intent intent =  new Intent(HomeActivity.this, LoginActivity.class);
-        startActivity(intent);
-
     }
 
     @Override
@@ -106,11 +102,11 @@ public class HomeActivity extends AppCompatActivity {
                         mWebView.loadUrl(HomeActivity.BASE_URL + tabPath[index]);
                         for (int buttonIndex = 0; buttonIndex < mTabButtons.size(); buttonIndex++) {
                             if(buttonIndex == index){
-                                mTabImageViews.get(index).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),selectedIcons[index]));
-                                mTabTextViews.get(index).setTextColor(getResources().getColor(R.color.colorPrimary));
+                                mTabImageViews.get(buttonIndex).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),selectedIcons[buttonIndex]));
+                                mTabTextViews.get(buttonIndex).setTextColor(getResources().getColor(R.color.colorPrimary));
                             } else {
-                                mTabImageViews.get(index).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),icons[index]));
-                                mTabTextViews.get(index).setTextColor(getResources().getColor(R.color.colorUnfocused));
+                                mTabImageViews.get(buttonIndex).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),icons[buttonIndex]));
+                                mTabTextViews.get(buttonIndex).setTextColor(getResources().getColor(R.color.colorUnfocused));
                             }
                         }
                     }

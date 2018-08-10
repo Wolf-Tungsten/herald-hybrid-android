@@ -69,8 +69,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void login(String cardnum, String password) {
 
-        Log.d("login-cardnum", cardnum);
-        Log.d("login-password", password);
+        Log.i("login-cardnum", cardnum);
         AuthService authService = new AuthService();
         authService.auth(cardnum, password).subscribe(new Observer<AuthService.AuthResult>() {
             @Override
