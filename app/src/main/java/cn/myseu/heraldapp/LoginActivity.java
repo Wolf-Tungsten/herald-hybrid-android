@@ -1,5 +1,6 @@
 package cn.myseu.heraldapp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Image;
 import android.support.v4.content.ContextCompat;
@@ -86,6 +87,8 @@ public class LoginActivity extends AppCompatActivity {
                     tokenEditor.clear();
                     tokenEditor.putString("token", authResult.getResult());
                     tokenEditor.commit();
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    startActivity(intent);
                     finish();
                 } else {
                     mLoginButton.setClickable(true);

@@ -27,10 +27,11 @@
             app:srcCompat="@drawable/toolbar_icon" />
     </android.support.v7.widget.Toolbar>
 
-    <cn.myseu.heraldapp.Components.AuthWebView
-        android:id="@+id/auth_web_view"
+    <LinearLayout
+        android:id="@+id/auth_web_view_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/herald_tabbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

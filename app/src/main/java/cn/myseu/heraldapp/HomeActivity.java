@@ -6,19 +6,27 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.tencent.smtt.sdk.ValueCallback;
 import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
+
+import cn.myseu.heraldapp.Components.AuthWebView;
 
 import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
 
     public static String BASE_URL = "http://192.168.1.101:8080";
-    private WebView mWebView;
+    private AuthWebView mWebView;
+    private LinearLayout mWebViewContainer;
 
     private ArrayList<LinearLayout> mTabButtons = new ArrayList<>();
     private ArrayList<ImageView> mTabImageViews = new ArrayList<>();
@@ -35,28 +43,73 @@ public class HomeActivity extends AppCompatActivity {
         toolBar.setTitle("");
         setSupportActionBar(toolBar);
 
-        // 获取WebView
-        mWebView = (WebView) findViewById(R.id.auth_web_view);
-        mWebView.clearCache(true);
-        mWebView.loadUrl(BASE_URL + tabPath[0]);
+        // 生成WebView
+        mWebView = new AuthWebView(HomeActivity.this);
+        mWebViewContainer = (LinearLayout) findViewById(R.id.auth_web_view_container);
+        mWebViewContainer.addView(mWebView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
         // 获取Tab元素
         findTabViews();
-        setTabListener();
+
+        // 检查token
+        final String token = getToken();
+        //String token = "no-token";
+        if (!token.equals("no-token")) {
+            // token存在，加载WebView
+            mWebView.setToken(token);
+            mWebView.setWebViewClient(new WebViewClient(){
+                @Override
+                public void onPageFinished(WebView webView, String s) {
+                    super.onPageFinished(webView, s);
+                    setTabListener();
+                    Log.d("webview","页面加载完成");
+                    mWebView.evaluateJavascript("window.androidMessage('message')", new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String s) {
+
+                        }
+                    });
+
+                    mWebView.evaluateJavascript("window.injectToken('"+token+"')", new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String s) {
+
+                        }
+                    });
+                }
+            });
+            mWebView.loadUrl(HomeActivity.BASE_URL + tabPath[0]); // 在创建活动时即加载
+        } else {
+            // token不存在，启动登录界面并销毁当前活动
+            Intent intent =  new Intent(HomeActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        // 用于调试
+        toolBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent =  new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        String token = getToken();
-        if (!token.equals("no-token")) {
-            // token存在
-            // TODO： 注入到WebView中
-        } else {
-            // token不存在
-            Intent intent =  new Intent(HomeActivity.this, LoginActivity.class);
-            startActivity(intent);
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mWebView != null) {
+            mWebViewContainer.removeAllViews();
+            if(mWebView != null) {
+                mWebView.clearHistory();
+                mWebView.clearCache(true);
+                mWebView.loadUrl("about:blank"); // clearView() should be changed to loadUrl("about:blank"), since clearView() is deprecated now
+                mWebView.pauseTimers();
+                mWebView = null; // Note that mWebView.destroy() and mWebView = null do the exact same thing
+            }
         }
-
     }
 
     private String getToken() {
