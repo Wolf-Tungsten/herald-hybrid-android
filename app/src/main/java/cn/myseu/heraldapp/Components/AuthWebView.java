@@ -34,11 +34,14 @@ public class AuthWebView extends WebView {
         this.token = token;
     }
 
-
-    @Override
-    public void loadUrl(String s) {
-        super.loadUrl(s + "?importToken="+this.token);
+    public void injectToken(String token) {
+        evaluateJavascript("window.injectToken('"+token+"')", new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String s) { }
+        });
     }
+
+
 
 
 }

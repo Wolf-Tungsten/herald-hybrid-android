@@ -63,19 +63,7 @@ public class HomeActivity extends AppCompatActivity {
                     super.onPageFinished(webView, s);
                     setTabListener();
                     Log.d("webview","页面加载完成");
-                    mWebView.evaluateJavascript("window.androidMessage('message')", new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String s) {
-
-                        }
-                    });
-
-                    mWebView.evaluateJavascript("window.injectToken('"+token+"')", new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String s) {
-
-                        }
-                    });
+                    mWebView.injectToken(token);
                 }
             });
             mWebView.loadUrl(HomeActivity.BASE_URL + tabPath[0]); // 在创建活动时即加载
