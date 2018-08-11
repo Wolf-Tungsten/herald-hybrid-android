@@ -140,7 +140,7 @@ public class HomeActivity extends AppCompatActivity {
                                 R.drawable.activity_tab_icon,
                                 R.drawable.notification_tab_icon,
                                 R.drawable.personal_tab_icon};
-                        mWebView.loadUrl(HomeActivity.BASE_URL + tabPath[index]);
+                        mWebView.pushRoute(tabPath[index]);
                         for (int buttonIndex = 0; buttonIndex < mTabButtons.size(); buttonIndex++) {
                             if(buttonIndex == index){
                                 mTabImageViews.get(buttonIndex).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),selectedIcons[buttonIndex]));

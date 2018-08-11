@@ -41,7 +41,14 @@ public class AuthWebView extends WebView {
         });
     }
 
+    public void pushRoute(String route) {
+        evaluateJavascript("window.goto('" + route + "')", new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String s) {
 
+            }
+        });
+    }
 
 
 }

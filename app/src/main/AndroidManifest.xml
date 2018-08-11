@@ -17,15 +17,20 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
             android:name=".HomeActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:icon="@drawable/logo"
+            >
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:icon="@drawable/logo"
+            />
         <activity
             android:name=".SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/StartAppTheme"
+            android:icon="@drawable/logo"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
