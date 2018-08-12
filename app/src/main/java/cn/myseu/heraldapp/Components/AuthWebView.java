@@ -39,6 +39,15 @@ public class AuthWebView extends WebView {
         webSettings.setAppCachePath(appCachePath);
         webSettings.setAllowFileAccess(true);
         webSettings.setAppCacheEnabled(true);
+
+        // 不显示滚动条
+        setHorizontalScrollBarEnabled(false);
+        setVerticalScrollBarEnabled(false);
+
+        // 不显示X5内核自带的快速滚动条
+        if(getX5WebViewExtension() != null) {
+            getX5WebViewExtension().setScrollBarFadingEnabled(false);
+        }
     }
 
     public void setToken(String token){

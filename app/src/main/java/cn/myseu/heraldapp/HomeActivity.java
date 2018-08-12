@@ -2,12 +2,14 @@ package cn.myseu.heraldapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -28,7 +30,9 @@ import java.util.Stack;
 public class HomeActivity extends AppCompatActivity {
 
     public static String BASE_URL = "http://192.168.1.101:8080";
-    private AuthWebView mWebView;
+    private AuthWebView mMainWebView;
+    private AuthWebView mSubWebView;
+    
     private LinearLayout mWebViewContainer;
     private ConstraintLayout mTabBar;
     private Toolbar mToolbar;
@@ -66,35 +70,20 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // 生成WebView
-        mWebView = new AuthWebView(HomeActivity.this);
-        mWebViewContainer = (LinearLayout) findViewById(R.id.auth_web_view_container);
-        mWebViewContainer.addView(mWebView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
+        // 初始化Tab
         mTabBar = (ConstraintLayout) findViewById(R.id.herald_tabbar);
-
-        // 获取Tab元素
         findTabViews();
 
         // 检查token
         mToken = getToken();
-        //String token = "no-token";
         if (!mToken.equals("no-token")) {
-            // token存在，加载WebView
-            mWebView.setWebViewClient(new WebViewClient(){
-                @Override
-                public void onPageFinished(WebView webView, String s) {
-                    super.onPageFinished(webView, s);
-                    setTabListener();
-                    Log.d("webview","页面加载完成");
-                    //mWebView.injectToken(mToken);
-                }
-            });
-            setJsInterface();
-            mWebView.loadUrl(HomeActivity.BASE_URL + tabPath[0]); // 在创建活动时即加载
+            // 初始化webView并设置JS注入、JS接口
+            initWebView();
         } else {
+            // 身份认证过期
             authFail();
         }
+        
 
         // 生成路由栈，初始为空
         mRouteHistory = new Stack<>();
@@ -102,16 +91,52 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (mWebView != null) {
+        if (mMainWebView != null) {
             mWebViewContainer.removeAllViews();
-            if(mWebView != null) {
-                mWebView.clearHistory();
-                mWebView.clearCache(true);
-                mWebView.loadUrl("about:blank"); // clearView() should be changed to loadUrl("about:blank"), since clearView() is deprecated no
-                mWebView.destroy(); // Note that mWebView.destroy() and mWebView = null do the exact same thing
+            if(mMainWebView != null) {
+                mMainWebView.clearHistory();
+                mMainWebView.clearCache(true);
+                mMainWebView.loadUrl("about:blank"); // clearView() should be changed to loadUrl("about:blank"), since clearView() is deprecated no
+                mMainWebView.destroy(); // Note that mMainWebView.destroy() and mMainWebView = null do the exact same thing
+            }
+            if(mSubWebView != null) {
+                mSubWebView.clearHistory();
+                mSubWebView.clearCache(true);
+                mSubWebView.loadUrl("about:blank"); // clearView() should be changed to loadUrl("about:blank"), since clearView() is deprecated no
+                mSubWebView.destroy(); // Note that mMainWebView.destroy() and mMainWebView = null do the exact same thing
             }
         }
         super.onDestroy();
+    }
+    
+    private void initWebView() {
+        // 生成WebView
+        mMainWebView = new AuthWebView(HomeActivity.this); // 用于主页显示的WebView
+        mSubWebView = new AuthWebView(HomeActivity.this); // 用于其他页面显示的WebView
+        
+        mWebViewContainer = (LinearLayout) findViewById(R.id.auth_web_view_container);
+        mWebViewContainer.addView(mMainWebView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        
+        mMainWebView.setWebViewClient(new WebViewClient(){
+            @Override
+            public void onPageFinished(WebView webView, String s) {
+                super.onPageFinished(webView, s);
+                setTabListener();
+            }
+        });
+        setJsInterface(mMainWebView);
+        mMainWebView.loadUrl(HomeActivity.BASE_URL + tabPath[0]); // 在创建活动时即加载
+        
+        // 同时初始化副WebView并加载页面
+        mSubWebView.setWebViewClient(new WebViewClient(){
+            @Override
+            public void onPageFinished(WebView webView, String s) {
+                super.onPageFinished(webView, s);
+            }
+        });
+        setJsInterface(mSubWebView);
+        mSubWebView.loadUrl(HomeActivity.BASE_URL + tabPath[0]); // 在创建活动时即加载
+                
     }
 
     private String getToken() {
@@ -163,10 +188,18 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
         }
+
+        @JavascriptInterface
+        public void openURLinBrowser(String url){
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        }
+
     }
 
-    private void setJsInterface() {
-        mWebView.addJavascriptInterface(new JsInterface(), "hybrid");
+    private void setJsInterface(AuthWebView webView) {
+        webView.addJavascriptInterface(new JsInterface(), "android");
     }
 
     private void authFail() {
@@ -177,9 +210,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void pushRoute(String route, String title){
-        Log.d("route", route);
-        Log.d("title", title);
-        mWebView.pushRoute(route);
+        
+        // 一旦路由入栈，一定是在副WebView中
+        mSubWebView.pushRoute(route);
         ArrayList<String> history = new ArrayList<>();
         history.add(route);
         history.add(title);
@@ -189,6 +222,9 @@ public class HomeActivity extends AppCompatActivity {
         mBackButton.setVisibility(View.VISIBLE);
         mTabBar.setVisibility(View.GONE);
         mIcon.setVisibility(View.GONE);
+        mWebViewContainer.removeAllViews();
+        mWebViewContainer.addView(mSubWebView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        
     }
 
     private void popRoute(){
@@ -196,13 +232,14 @@ public class HomeActivity extends AppCompatActivity {
         if(!mRouteHistory.empty()) {
             ArrayList<String> history = mRouteHistory.peek();
             mNavigationTitle.setText(history.get(1));
-            mWebView.pushRoute(history.get(0));
+            mSubWebView.pushRoute(history.get(0));
         } else {
             mNavigationTitle.setVisibility(View.GONE);
             mBackButton.setVisibility(View.GONE);
             mIcon.setVisibility(View.VISIBLE);
             mTabBar.setVisibility(View.VISIBLE);
-            mWebView.pushRoute(tabPath[mTabCurrentIndex]);
+            mWebViewContainer.removeAllViews();
+            mWebViewContainer.addView(mMainWebView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         }
     }
 
@@ -223,7 +260,7 @@ public class HomeActivity extends AppCompatActivity {
                                 R.drawable.activity_tab_icon,
                                 R.drawable.notification_tab_icon,
                                 R.drawable.personal_tab_icon};
-                        mWebView.pushRoute(tabPath[index]);
+                        mMainWebView.pushRoute(tabPath[index]);
                         for (int buttonIndex = 0; buttonIndex < mTabButtons.size(); buttonIndex++) {
                             if(buttonIndex == index){
                                 mTabImageViews.get(buttonIndex).setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),selectedIcons[buttonIndex]));
@@ -237,6 +274,34 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mRouteHistory.empty()) {
+                // 如果历史栈是空的，则返回桌面，但不退出程序
+                Intent home = new Intent(Intent.ACTION_MAIN);
+                home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                home.addCategory(Intent.CATEGORY_HOME);
+                startActivity(home);
+                return true;
+            } else {
+                // 历史栈不为空则回退历史栈
+                popRoute();
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

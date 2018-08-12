@@ -111,19 +111,25 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    // 拦截返回键
-    public boolean onKeyDown(int keyCode, KeyEvent event){
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            return false;
-        } else {
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent home = new Intent(Intent.ACTION_MAIN);
+            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            home.addCategory(Intent.CATEGORY_HOME);
+            startActivity(home);
             return true;
         }
+        return super.onKeyDown(keyCode, event);
     }
-    public boolean onKeyUp(int keyCode, KeyEvent event){
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             return false;
-        } else {
-            return true;
         }
+        return super.onKeyDown(keyCode, event);
     }
 }
