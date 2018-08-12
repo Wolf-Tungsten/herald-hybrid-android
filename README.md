@@ -26,13 +26,13 @@
 
 ## 项目进度
 
-[*] 原生 - 身份认证
-[*] 原生 - Token 注入（通过 JavaScriptInterface ）
-[*] 原生 -  tab 切换
-[*] 原生 - 路由接管
-[*] Web - api.js 改造
-[*] Web - 主页面适配
-[*] Web - 通知公告部分适配
+[-] 原生 - 身份认证
+[-] 原生 - Token 注入（通过 JavaScriptInterface ）
+[-] 原生 -  tab 切换
+[-] 原生 - 路由接管
+[-] Web - api.js 改造
+[-] Web - 主页面适配
+[-] Web - 通知公告部分适配
 
 
 
