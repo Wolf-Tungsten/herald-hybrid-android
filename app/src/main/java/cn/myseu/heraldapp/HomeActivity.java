@@ -123,6 +123,13 @@ public class HomeActivity extends AppCompatActivity {
                 super.onPageFinished(webView, s);
                 setTabListener();
             }
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView webView, String s) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(s));
+                startActivity(i);
+                return true;
+            }
         });
         setJsInterface(mMainWebView);
         mMainWebView.loadUrl(HomeActivity.BASE_URL + tabPath[0]); // 在创建活动时即加载
