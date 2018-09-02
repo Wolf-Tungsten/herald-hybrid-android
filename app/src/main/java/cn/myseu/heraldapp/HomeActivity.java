@@ -218,6 +218,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void authFail() {
+        // 清除token，以退出登录
+        SharedPreferences cacheSharedPreferences = getSharedPreferences("token", MODE_PRIVATE);
+        SharedPreferences.Editor editor = cacheSharedPreferences.edit();
+        editor.clear();
+        editor.commit();
         // token不存在，启动登录界面并销毁当前活动
         Intent intent =  new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intent);
